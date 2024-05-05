@@ -1,0 +1,12 @@
+{"properties": [
+  {
+    "name": "context.client.path",
+    "type": "java.lang.String",
+    "description": "A description for 'context.client.path'"
+  },
+  {
+    "name": "context.endpoint.product",
+    "type": "java.lang.String",
+    "description": "A description for 'context.endpoint.product'"
+  }
+]}
