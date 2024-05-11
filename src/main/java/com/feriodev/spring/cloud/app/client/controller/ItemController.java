@@ -1,8 +1,14 @@
 package com.feriodev.spring.cloud.app.client.controller;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.client.circuitbreaker.ReactiveCircuitBreakerFactory;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
+import org.springframework.core.env.Environment;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,6 +27,7 @@ import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+@RefreshScope
 @RestController
 @RequestMapping("/api/client")
 @Slf4j
@@ -29,6 +36,12 @@ public class ItemController {
 	@Autowired
 	@Qualifier("serviceItem")
 	private ItemService service;
+	
+	@Value("${configuration.text}")
+	private String configurationText;
+	
+	@Autowired
+	private Environment env;
 	
 	@SuppressWarnings("rawtypes")
 	@Autowired
@@ -71,4 +84,24 @@ public class ItemController {
 				.contentType(MediaType.APPLICATION_JSON).body(item))
 				.defaultIfEmpty(ResponseEntity.notFound().build());
 	}
+	
+	
+	@GetMapping("/config")
+	public ResponseEntity<Map<String, String>> getConfig(@Value("${server.port}") String port) {
+		Map<String, String> json = new HashMap<>();
+		json.put("config", configurationText);
+		json.put("port", port);		
+		
+		log.info("Json: " + json.toString());
+		
+		if (env.getActiveProfiles().length > 0 && env.getActiveProfiles()[0].equals("dev")) {
+			json.put("author.name", env.getProperty("configuration.author.name"));
+			json.put("author.email", env.getProperty("configuration.author.email"));
+		}
+		
+		return ResponseEntity
+				.ok()
+				.body(json);
+	}
+	
 }
