@@ -9,13 +9,19 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.client.circuitbreaker.ReactiveCircuitBreakerFactory;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.core.env.Environment;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.feriodev.spring.cloud.app.client.model.Item;
@@ -26,6 +32,7 @@ import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+
 
 @RefreshScope
 @RestController
@@ -99,9 +106,25 @@ public class ItemController {
 			json.put("author.email", env.getProperty("configuration.author.email"));
 		}
 		
-		return ResponseEntity
-				.ok()
-				.body(json);
+		return ResponseEntity.ok().body(json);
+	}
+	
+	@PostMapping("/create")
+	@ResponseStatus(HttpStatus.CREATED)
+	public Mono<Product> save(@RequestBody Product product) {
+		return service.save(product);
+	}
+	
+	@PutMapping("/update/{id}")
+	@ResponseStatus(HttpStatus.CREATED)
+	public Mono<Product> update(@PathVariable String id, @RequestBody Product product) {
+		return service.update(id, product);
+	}
+	
+	@DeleteMapping("/delete/{id}")
+	@ResponseStatus(HttpStatus.NO_CONTENT)
+	public Mono<Void> delete(@PathVariable String id) {
+		return service.delete(id);
 	}
 	
 }
