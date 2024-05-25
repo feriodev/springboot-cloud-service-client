@@ -36,7 +36,7 @@ import reactor.core.publisher.Mono;
 
 @RefreshScope
 @RestController
-@RequestMapping("/api/client")
+@RequestMapping
 @Slf4j
 public class ItemController {
 
